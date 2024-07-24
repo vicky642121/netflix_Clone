@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import Header from './Header'
 import NetflixImages from "../images";
+import axios from "axios";
+import { API_END_POINT } from '../utils/constant';
+import toast from 'react-hot-toast';
 
 const Login = () => {
 
@@ -27,7 +30,7 @@ const Login = () => {
     }
     // console.log(slform);
 
-    const handleData = (e)=>{
+    const handleData = async(e)=>{
 
         e.preventDefault()
         var iserror = false;
@@ -63,6 +66,47 @@ const Login = () => {
         if(!iserror){
 
             console.log(slform.email,slform.password,slform.fullname);
+            if(!isLogin){
+                console.log('register');
+                const user_data =  slform ;
+                //login
+                try{
+    
+                    const response = await axios.post(`${API_END_POINT}register`,user_data);
+                    if(response.data.success == true){
+
+                        toast.success(response.data.message);
+                    }
+                }
+                catch (error){
+                    
+                    console.log(error)
+                    if (error.response && error.response.status === 401) {
+                        toast.error(error.response.message);
+                    }                    
+                }
+            }
+            else{
+                console.log('login');
+    
+                const user_data =  slform ;
+                try{
+    
+                    const response = await axios.post(`${API_END_POINT}/login`,user_data);
+                   console.log( response.data.success);
+                    if(response.data.success == true){
+
+                        toast.success(response.data.message);
+                    }
+                }
+                catch (error){
+                    // toast.error(error);
+                    console.log(error)
+                    if (error.response && error.response.status === 401) {
+                        toast.error('Invalid Credentials');
+                    }
+                }
+            }
         }
     }
 

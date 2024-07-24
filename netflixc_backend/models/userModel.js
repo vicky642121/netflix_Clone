@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema({
         type:String,
         require:true
     }
+},{    
+    timestamps: true,
+    underscored: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
 });
 
-export const User = mongoose.model("User",userSchema);
+module.exports = mongoose.model("User",userSchema);
