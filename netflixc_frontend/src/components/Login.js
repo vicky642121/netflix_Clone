@@ -4,7 +4,7 @@ import NetflixImages from "../images";
 import axios from "axios";
 import { API_END_POINT } from '../utils/constant';
 import toast from 'react-hot-toast';
-
+import useNavigate from 'react-router-dom';
 const Login = () => {
 
     const[isLogin, setIsLogin] = useState(false);
@@ -72,7 +72,14 @@ const Login = () => {
                 //login
                 try{
     
-                    const response = await axios.post(`${API_END_POINT}register`,user_data);
+                    const response = await axios.post(`${API_END_POINT}register`,user_data,{
+
+                        headers:{
+                            'Content-Type':'application/json',
+                            "Access-Control-Allow-Credentials": true
+                        },
+                        withCredentials:true
+                    });
                     if(response.data.success == true){
 
                         toast.success(response.data.message);
@@ -81,9 +88,7 @@ const Login = () => {
                 catch (error){
                     
                     console.log(error)
-                    if (error.response && error.response.status === 401) {
-                        toast.error(error.response.message);
-                    }                    
+                        toast.error(error.response.data.message);
                 }
             }
             else{
@@ -92,7 +97,12 @@ const Login = () => {
                 const user_data =  slform ;
                 try{
     
-                    const response = await axios.post(`${API_END_POINT}/login`,user_data);
+                    const response = await axios.post(`${API_END_POINT}login`,user_data,{
+                        headers:{
+                            'Content-Type':"application/json"
+                        },
+                        withCredentials:true
+                    });
                    console.log( response.data.success);
                     if(response.data.success == true){
 
@@ -102,9 +112,7 @@ const Login = () => {
                 catch (error){
                     // toast.error(error);
                     console.log(error)
-                    if (error.response && error.response.status === 401) {
-                        toast.error('Invalid Credentials');
-                    }
+                    toast.error(error.response.data.message);
                 }
             }
         }
