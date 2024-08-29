@@ -4,10 +4,15 @@ import NetflixImages from "../images";
 import axios from "axios";
 import { API_END_POINT } from '../utils/constant';
 import toast from 'react-hot-toast';
-import useNavigate from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
+import {useDispatch, useSelector} from "react-redux";
+import { setUser,setLoading } from '../redux/userSlice';
 const Login = () => {
 
     const[isLogin, setIsLogin] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const user = useSelector((store)=>store.users);
     const[slform,setSlForm] = useState({
         email:"",
         password:"",
@@ -66,6 +71,7 @@ const Login = () => {
         if(!iserror){
 
             console.log(slform.email,slform.password,slform.fullname);
+            dispatch(setLoading(true))
             if(!isLogin){
                 console.log('register');
                 const user_data =  slform ;
@@ -81,19 +87,23 @@ const Login = () => {
                         withCredentials:true
                     });
                     if(response.data.success == true){
-
                         toast.success(response.data.message);
+                        dispatch(setLoading(false));
+
                     }
                 }
-                catch (error){
+                catch (error){  
                     
                     console.log(error)
-                        toast.error(error.response.data.message);
+                    toast.error(error.response.data.message);
+                    dispatch(setLoading(false));
+
                 }
             }
             else{
                 console.log('login');
-    
+                dispatch(setLoading(true))
+
                 const user_data =  slform ;
                 try{
     
@@ -105,14 +115,18 @@ const Login = () => {
                     });
                    console.log( response.data.success);
                     if(response.data.success == true){
-
+                        dispatch(setUser(response.data.result));
                         toast.success(response.data.message);
+                        navigate('/browse');
+                        dispatch(setLoading(false));
+
                     }
                 }
                 catch (error){
                     // toast.error(error);
                     console.log(error)
                     toast.error(error.response.data.message);
+                    dispatch(setLoading(false));
                 }
             }
         }
@@ -139,7 +153,7 @@ const Login = () => {
                 <input value={slform.password} type='password' placeholder='Password' className='outline-none p-3 my-2 rounded-md bg-gray-800 text-white' onChange={(e)=>setSlForm({...slform,password:e.target.value})}/>
                 {slformerror.passworderr !='' && <span className='text-red-800 font-medium' >{slformerror.passworderr}</span>}
 
-                <button className='bg-red-800 mt-6 p-5  rounded-md text-white font-medium text-md'>{isLogin?"Sign in":"Sign up"}</button>
+                <button type="submit" className='bg-red-800 mt-6 p-5  rounded-md text-white font-medium text-md'>{`${user.isLoading?"loading...":isLogin?"Sign in":"Sign up"}`}</button>
                 <p className='text-white text-center mt-5 font-bold'>{isLogin?"New to Netflix?":"Already have an account?"}<span className='text-blue-700 pl-2 cursor-pointer' onClick={()=>handleLogin()}>{isLogin?"Signup":"Sign in"}</span></p>
             </div>
         </form>

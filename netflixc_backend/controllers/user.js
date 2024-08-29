@@ -39,6 +39,7 @@ const Login = async(req,res)=>{
         const token = await jwt.sign(tokenData,'crud1234',{expiresIn:"1d"});
         return res.status(200).cookie("token",token,{httpOnly:true}).json({
             message:`Welcome back ${user.fullname}`,
+            result:user,
             success:true
         })
 
